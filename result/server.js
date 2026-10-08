@@ -72,6 +72,6 @@ app.get('/', function (req, res) {
 });
 
 server.listen(port, function () {
-  var port = server.address().port;
+  var port = process.env.PORT || 8000 || server.address().port;
   console.log('App running on port ' + port);
 });
