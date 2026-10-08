@@ -4,7 +4,7 @@ WORKDIR /app
 ENV NODE_ENV=production PORT=8000
 
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . .
 EXPOSE 8000
