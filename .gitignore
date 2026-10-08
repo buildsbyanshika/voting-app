@@ -1,0 +1,9 @@
+result/node_modules/
+__pycache__/
+*.pyc
+bin/
+obj/
+.env
+*.log
+.vscode/
+.idea/
