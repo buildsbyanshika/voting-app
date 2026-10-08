@@ -1,10 +1,10 @@
-FROM node:20-slim
+FROM node:20-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production PORT=8000
 
 COPY package*.json ./
-RUN npm ci --omit=dev  || npm install --omit=dev
+RUN npm ci --only=production && npm cache clean --force
 
 COPY . .
 EXPOSE 8000
