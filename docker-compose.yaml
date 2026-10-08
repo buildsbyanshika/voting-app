@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+
+services:
+  vote:
+    image: ${HUB_USER}/voting-vote:${TAG}
+    ports: ["5000:8000"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [front-tier, back-tier]
+    restart: unless-stopped
+
+  result:
+    image: ${HUB_USER}/voting-result:${TAG}
+    ports: ["5001:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [front-tier, back-tier]
+    restart: unless-stopped
+
+  worker:
+    image: ${HUB_USER}/voting-worker:${TAG}
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks: [back-tier]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks: [back-tier]
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks: [back-tier]
+
+volumes:
+  db-data:
+
+networks:
+  front-tier:
+  back-tier:
+
+  
