@@ -7,3 +7,4 @@ obj/
 *.log
 .vscode/
 .idea/
+secret*.yaml

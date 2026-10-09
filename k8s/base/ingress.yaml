@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.30.0-standalone-strict/all.json
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voting
+  namespace: voting
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: vote.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 8000
+    - host: result.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: result
+                port:
+                  number: 8000
