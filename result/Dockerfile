@@ -1,4 +1,4 @@
-FROM node:20-apline
+FROM node:20-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production PORT=8000
