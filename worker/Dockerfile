@@ -1,9 +1,6 @@
 # for local platform
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-# ARG TARGETPLATFORM
 ARG TARGETARCH
-# ARG BUILDPLATFORM
-# RUN echo"Running on $BUILDPLATFORM , building for $TARGETPLATFORM"
 
 WORKDIR /source
 COPY *.csproj .
