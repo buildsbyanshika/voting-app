@@ -1,0 +1,27 @@
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+
+{{- if .Values.autoscaling.enabled }}
+{{- range $name := list "vote" "result" }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $name }}
+  minReplicas: {{ $.Values.autoscaling.minReplicas }}
+  maxReplicas: {{ $.Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $.Values.autoscaling.cpu }}
+{{- end }}
+{{- end }}

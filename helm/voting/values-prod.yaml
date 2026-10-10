@@ -1,0 +1,12 @@
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+apps:
+  vote: {tag: 1.0.0, replicas: 3}
+  result: {tag: 1.0.0, replicas: 3}
+ingress:
+  hosts: {vote: vote.example.com, result: result.example.com}
+  tlsSecret: voting-prod-tls
+autoscaling: {enabled: true, minReplicas: 3, maxReplicas: 10, cpu: 65}
+networkPolicy: {enabled: true}
+postgres: {storage: 20Gi, storageClass: managed-csi-premium}
