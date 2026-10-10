@@ -1,0 +1,9 @@
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+apps:
+  vote:   {tag: 1.0.0, replicas: 2}
+  result: {tag: 1.0.0, replicas: 2}
+ingress:
+  hosts: {vote: vote.staging.example.com, result: result.staging.example.com}
+  tlsSecret: voting-staging-tls
+networkPolicy: {enabled: true}

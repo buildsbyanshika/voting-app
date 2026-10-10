@@ -1,0 +1,75 @@
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+global:
+  # imageRegistry: docker.io/buildbyanshika
+  registry: docker.io/buildbyanshika
+  imagePullSecrets: [dockerhub-creds]
+    # - name: dockerhub-creds
+
+apps:
+  vote:
+    image: voting-vote   # Docker-Hub image name
+    tag: 1.0.1
+    port: 8000
+    replicas: 2
+    runAsUser: 10001
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+  result:
+    image: voting-result   # Docker-Hub image name
+    tag: 1.0.1
+    port: 8000
+    replicas: 2
+    runAsUser: 1000
+    resources:
+      requests:
+        cpu: 50m
+        memory: 96Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+  worker:
+    image: voting-worker   # Docker-Hub image name
+    tag: 1.0.1
+    port: 0
+    replicas: 1
+    runAsUser: 1654
+    resources:
+      requests:
+        cpu: 50m
+        memory: 96Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+
+postgres:
+  image: postgres:15-alpine
+  storage: 5Gi
+  storageClass: ''
+  secretName: postgres-secret
+
+redis:
+  image: redis:7-alpine
+
+ingress:
+  enabled: true
+  className: nginx
+  tlsSecret: ''
+  hosts:
+    vote: vote.local
+    result: result.local
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  cpu: 70
+
+networkPolicy:
+  enabled: false

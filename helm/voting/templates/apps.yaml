@@ -1,0 +1,83 @@
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+
+{{- range $name, $a := .Values.apps }}
+---
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+spec:
+  {{- if not (and $.Values.autoscaling.enabled $a.port) }}
+  replicas: {{ $a.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      {{- with $.Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ $a.runAsUser }}
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ $name }}
+          image: {{ $.Values.global.registry }}/{{ $a.image }}:{{ $a.tag }}
+          imagePullPolicy: IfNotPresent
+          {{- if $a.port }}
+          ports:
+            - containerPort: {{ $a.port }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ $a.port }}
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ $a.port }}
+            initialDelaySeconds: 15
+          {{- end }}
+          resources:
+            {{- toYaml $a.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+{{- if $a.port }}
+---
+# Official Helm values documentation: https://helm.sh/docs/chart_template_guide/values_files/
+
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+spec:
+  selector:
+    app: {{ $name }}
+  ports:
+    - port: 80
+      targetPort: {{ $a.port }}
+{{- end }}
+{{- end }}
